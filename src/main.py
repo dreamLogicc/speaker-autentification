@@ -6,6 +6,7 @@ import pandas as pd
 from augmentation import augmentation
 import librosa
 import io
+import numpy as np
 
 app = FastAPI(
     title='Audio Autentification'
@@ -16,7 +17,7 @@ def upload_file(audio_1: bytes = File(), audio_2: bytes = File()):
   y_1, sr_1 = librosa.load(io.BytesIO(audio_1), mono=True, duration=1)
   y_2, sr_2 = librosa.load(io.BytesIO(audio_2), mono=True, duration=1)
 
-  data = pd.read_csv('../fastapi_app/data/data_for_api.csv')
+  data = pd.read_csv('/app/data_for_api.csv')
 
   audio_1_features = get_features_df(y_1, sr_1)
   audio_2_features = get_features_df(y_2, sr_2)
@@ -34,7 +35,7 @@ def upload_file(audio_1: bytes = File(), audio_2: bytes = File()):
 
   model.fit(pd.concat([data, audio_1_features], axis=0, ignore_index=True), labels)
 
-  pred = model.predict(audio_2_features)
+  pred = model.predict(np.array(audio_2_features))
   flag = False
   if pred[0] == 0:
     flag = True

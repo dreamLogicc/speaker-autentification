@@ -65,7 +65,7 @@ def augmentation(y ,sr, num_samples):
 
 if __name__ == '__main__':
 
-    y ,sr = librosa.load('./fastapi_app/Голосовые/Степа/Гайволя Степан Вход (1).wav', mono=True, duration=1)
+    y ,sr = librosa.load('./fastapi_app/voice_data/Степа/Гайволя Степан Вход (1).wav', mono=True, duration=1)
 
     noised = add_noise(y, 0.005)
     sf.write('./fastapi_app/test_aug/noised.wav', noised, sr)

@@ -6,8 +6,8 @@ import scipy
 
 def get_files():
     files = []
-    for dir in os.listdir('./fastapi_app/Голосовые'):
-        for file in os.listdir('./fastapi_app/Голосовые' + '/' + dir):
+    for dir in os.listdir('./fastapi_app/voice_data'):
+        for file in os.listdir('./fastapi_app/voice_data' + '/' + dir):
 
             if 'Вход' in file:
                 phrase = 'Вход'
@@ -21,7 +21,7 @@ def get_files():
                 phrase = 'Шкаф'
 
             files.append({
-                    'path': './fastapi_app/Голосовые' + '/' + dir + '/' + file,
+                    'path': './fastapi_app/voice_data' + '/' + dir + '/' + file,
                     'name': dir,
                     'phrase': phrase
                 })
