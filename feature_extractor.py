@@ -5,6 +5,9 @@ import os
 import scipy
 
 def get_files():
+    '''
+        Функция сообирает файлы из дериктории в датафрейм
+    '''
     files = []
     for dir in os.listdir('./fastapi_app/voice_data'):
         for file in os.listdir('./fastapi_app/voice_data' + '/' + dir):
@@ -29,6 +32,12 @@ def get_files():
     return pd.DataFrame(files)
 
 def feature_extractor(y, sr):
+    '''
+        Функция для выделения фичей
+        y: временной ряд аудиофайла
+        sr: частота дискретизации
+    '''
+
     features = [] 
     features.extend([np.mean(e) for e in librosa.feature.mfcc(y=y, sr=sr, 
                                                               n_mfcc=20)])  # mfcc_mean<0..20>
@@ -48,6 +57,12 @@ def feature_extractor(y, sr):
     return features
 
 def get_features_df(y, sr):
+    '''
+        Функция для создания датафрейма из фичей
+        y: временной ряд аудиофайла
+        sr: частота дискретизации
+    '''
+
     all_features = []
     features = feature_extractor(y, sr)
     temp = {}
@@ -64,6 +79,10 @@ def get_features_df(y, sr):
     return pd.DataFrame(all_features)
 
 def get_full_data():
+    '''
+        Функция для получения полного датасета
+    '''
+
     data = get_files()
     print(data)
     features = pd.DataFrame()

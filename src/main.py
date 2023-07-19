@@ -14,6 +14,7 @@ app = FastAPI(
 
 @app.post("/file/upload-file")
 def upload_file(audio_1: bytes = File(), audio_2: bytes = File()):
+  '''Функция принимате на вход два аудиофайла и сравнивает их между собой'''
   y_1, sr_1 = librosa.load(io.BytesIO(audio_1), mono=True, duration=1)
   y_2, sr_2 = librosa.load(io.BytesIO(audio_2), mono=True, duration=1)
 

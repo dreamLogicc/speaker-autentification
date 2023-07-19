@@ -3,12 +3,20 @@ import librosa
 import soundfile as sf
 
 def add_noise(data, noise_factor):
+    ''' Функция добавляет шум на аудиофайл
+        noise_factor: интенсивность шума
+    '''
     noise = np.random.randn(len(data))
     augmented_data = data + noise_factor * noise
     augmented_data = augmented_data.astype(type(data[0]))
     return augmented_data
 
 def shift(data, shift_max, shift_direction = 'right'):
+    ''' Функция для сдвига аудио в данном направлении
+        shift_max: максимальный сдвиг
+        shift_direction: направление сдвига
+    '''
+
     shift = np.random.randint(1000, shift_max)
     if shift_direction == 'right':
         shift = -shift
@@ -24,6 +32,10 @@ def shift(data, shift_max, shift_direction = 'right'):
     return augmented_data
 
 def stretch(data, rate=1):
+    ''' Функция растяжения или сжатия аудио
+        rate:свеличина показывающая во сколько раз растянуть или сжать
+    '''
+
     input_length = 22050
     data = librosa.effects.time_stretch(y=data, rate=rate)
     if len(data)>input_length:
@@ -34,9 +46,17 @@ def stretch(data, rate=1):
     return data
 
 def volume(y):
+    ''' Функция увеличения громкости
+    '''
     return y*np.random.uniform(2,3)
 
 def augmentation(y ,sr, num_samples):
+    '''
+        Функция выполняет аугментацию 
+        y: временной ряд аудиофайла
+        sr: частота дискретизации
+        num_samples: число генерируемых аудио
+    '''
 
     i = 0
     augmented_array = []
