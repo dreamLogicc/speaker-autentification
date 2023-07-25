@@ -10,8 +10,8 @@ app = FastAPI(
     title='Audio Autentification'
 )
 
-model_person = joblib.load('./person_clf.joblib')
-model_phrase = joblib.load('./phrase_clf1.joblib')
+model_person = joblib.load('/app/person_clf.joblib')
+model_phrase = joblib.load('/app/phrase_clf1.joblib')
 
 threshold = 0.5
 
