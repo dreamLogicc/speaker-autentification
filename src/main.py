@@ -1,45 +1,44 @@
 from fastapi import FastAPI, File
 from feature_extractor import get_features_df
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import mean_absolute_percentage_error
 import pandas as pd
-from augmentation import augmentation
 import librosa
 import io
 import numpy as np
+import joblib
 
 app = FastAPI(
     title='Audio Autentification'
 )
 
+model_person = joblib.load('./person_clf.joblib')
+model_phrase = joblib.load('./phrase_clf1.joblib')
+
+threshold = 0.5
+
+
 @app.post("/file/upload-file")
 def upload_file(audio_1: bytes = File(), audio_2: bytes = File()):
-  '''Функция принимате на вход два аудиофайла и сравнивает их между собой'''
-  y_1, sr_1 = librosa.load(io.BytesIO(audio_1), mono=True, duration=1)
-  y_2, sr_2 = librosa.load(io.BytesIO(audio_2), mono=True, duration=1)
+    '''Функция принимате на вход два аудиофайла и сравнивает их между собой'''
+    y_1, sr_1 = librosa.load(io.BytesIO(audio_1), mono=True, duration=1)
+    y_2, sr_2 = librosa.load(io.BytesIO(audio_2), mono=True, duration=1)
 
-  data = pd.read_csv('/app/data_for_api.csv')
+    features_1 = get_features_df(y_1, sr_1)
+    features_2 = get_features_df(y_2, sr_2)
 
-  audio_1_features = get_features_df(y_1, sr_1)
-  audio_2_features = get_features_df(y_2, sr_2)
+    person_probas = model_person.predict_proba(
+        np.array(pd.concat([features_1, features_2], axis=1)))
+    phrase_probas = model_phrase.predict_proba(
+        np.array(pd.concat([features_1, features_2], axis=1)))
 
-  similarity = round(100 - mean_absolute_percentage_error(audio_1_features, audio_2_features), 2)
+    person = 1 if person_probas[0][1] > threshold else 0
+    phrase = 1 if phrase_probas[0][1] > threshold else 0
 
-  audio_1_features = audio_1_features.drop(0) 
-  for augmented_audio in augmentation(y_1, sr_1, data.shape[0]):
-    audio_1_features = pd.concat([audio_1_features, get_features_df(augmented_audio[0], augmented_audio[1])])
+    flag = False
+    similarity = 0
+    if person:
+        if phrase:
+            flag = True
+            similarity = round(
+                (person_probas[0][1]*100 + phrase_probas[0][1]*100)/2, 2)
 
-  labels = [1] * data.shape[0]
-  labels.extend([0] * audio_1_features.shape[0])
-
-  model = KNeighborsClassifier(n_neighbors=1, n_jobs=-1)
-
-  model.fit(pd.concat([data, audio_1_features], axis=0, ignore_index=True), labels)
-
-  pred = model.predict(np.array(audio_2_features))
-  flag = False
-  if pred[0] == 0:
-    flag = True
-  else: similarity = 0
-
-  return {'Access': flag, 'Similarity': str(similarity) + '%'}
+    return {'Access': flag, 'Similarity': str(similarity) + '%'}
