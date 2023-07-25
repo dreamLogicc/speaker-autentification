@@ -2,9 +2,9 @@ FROM python
 
 WORKDIR /app
 
-ADD ./augmentation.py /app/augmentation.py
 ADD ./feature_extractor.py /app/feature_extractor.py
-ADD ./data/data_for_api.csv /app/data_for_api.csv
+ADD ./phrase_clf1.joblib /app/phrase_clf1.joblib
+ADD ./person_clf.joblib /app/person_clf.joblib
 
 COPY ./req.txt /app/req.txt
 COPY ./src /app/src
